@@ -1,0 +1,136 @@
+import networkx as nx
+from collections import namedtuple
+
+
+class GraphUtil:
+    SOURCE = 12
+    TARGET = 1
+
+    def __init__(self):
+        self.graph = nx.Graph()
+        self.__init_edges()
+        self.__init_tunnels()
+        self.clear_edges_load()
+
+    @property
+    def graph(self):
+        return self._graph
+
+    @graph.setter
+    def graph(self, value):
+        self._graph = value
+
+    @property
+    def source(self):
+        return self._source
+
+    @source.setter
+    def source(self, value):
+        self._source = value
+
+    @property
+    def target(self):
+        return self._target
+
+    @target.setter
+    def target(self, value):
+        self._target = value
+
+    @property
+    def unique_routes(self):
+        unique_routes = list(nx.all_simple_paths(
+            self.graph, source=self.SOURCE, target=self.TARGET))
+        unique_routes.sort(key=len)
+        return unique_routes
+
+    @property
+    def unique_routes_cnt(self):
+        return len(self.unique_routes)
+
+    @property
+    def unique_routes_edges(self):
+        return [self._nodes_to_edges(route) for route in self.unique_routes]
+
+    @property
+    def tunnels(self):
+        tunnels = []
+        tunnels.append(self.tunnel1)
+        tunnels.append(self.tunnel2)
+        tunnels.append(self.tunnel3)
+        tunnels.append(self.tunnel4)
+        tunnels.append(self.tunnel5)
+        return tunnels
+
+    @property
+    def tunnels_cnt(self):
+        return len(self.tunnels)
+
+    @property
+    def tunnels_routes(self):
+        return [t.route for t in self.tunnels]
+
+    @property
+    def routes_with_index(self):
+        i = self.tunnels_cnt
+        rwi = []
+        for u in self.unique_routes:
+            if u in self.tunnels_routes:
+                continue
+            else:
+                rwi.append((i, u))
+                i += 1
+        return rwi
+
+    @property
+    def unique_edges_set(self):
+        u = []
+        for ure in self.unique_routes_edges:
+            for edge in ure:
+                if edge not in u:
+                    u.append(edge)
+        return u
+
+    def _nodes_to_edges(self, node_route):
+        edges = []
+        y = node_route[0]
+        for i in range(1, len(node_route)):
+            x = y
+            y = node_route[i]
+            edge = (x, y)
+            edges.append(edge)
+        return edges
+
+    def get_route_load(self, path):
+        edge_path = self._nodes_to_edges(path)
+        load_koefs = []
+        for i, u in edge_path:
+            load_koefs.append(self.graph[i][u]['K'])
+        return sum(load_koefs)
+
+    def __init_edges(self):
+        self.graph.add_nodes_from(list(range(1, 30)))
+        self.graph.add_edges_from([(1, 2), (1, 29), (1, 23), (1, 26)])
+        self.graph.add_edge(30, 29)
+        self.graph.add_edges_from([(21, 23), (21, 22), (21, 20)])
+        self.graph.add_edges_from(
+            [(28, 27), (27, 26), (26, 24), (24, 25), (22, 24)])
+        self.graph.add_edges_from([(5, 3), (5, 2), (5, 6)])
+        self.graph.add_edges_from([(4, 3), (3, 2), (2, 19), (19, 18),
+                                   (18, 17), (17, 16), (16, 15), (15, 20)])
+        self.graph.add_edges_from([(19, 6), (6, 7), (7, 8), (8, 9), (9, 10),
+                                   (10, 11), (11, 12), (11, 13),
+                                   (13, 14), (14, 15)])
+
+    def __init_tunnels(self):
+        Tunnel = namedtuple('MPLSTunnel', 'index, qos, route')
+        self.tunnel1 = Tunnel(0, 1, self.unique_routes[4])
+        self.tunnel2 = Tunnel(1, 2, self.unique_routes[1])
+        self.tunnel3 = Tunnel(2, 1, self.unique_routes[2])
+        self.tunnel4 = Tunnel(3, 3, self.unique_routes[7])
+        self.tunnel5 = Tunnel(4, 4, self.unique_routes[3])
+
+    def clear_edges_load(self):
+        for edge in self.graph.edges():
+            i, j = edge
+            self.graph[i][j]['K'] = 0
+            self.graph[i][j]['intensity'] = 0
