@@ -110,18 +110,53 @@ class GraphUtil:
         return sum(load_koefs)
 
     def __init_edges(self):
-        self.graph.add_nodes_from(list(range(1, 30)))
-        self.graph.add_edges_from([(1, 2), (1, 29), (1, 23), (1, 26)])
-        self.graph.add_edge(30, 29)
-        self.graph.add_edges_from([(21, 23), (21, 22), (21, 20)])
-        self.graph.add_edges_from(
-            [(28, 27), (27, 26), (26, 24), (24, 25), (22, 24)])
-        self.graph.add_edges_from([(5, 3), (5, 2), (5, 6)])
-        self.graph.add_edges_from([(4, 3), (3, 2), (2, 19), (19, 18),
-                                   (18, 17), (17, 16), (16, 15), (15, 20)])
-        self.graph.add_edges_from([(19, 6), (6, 7), (7, 8), (8, 9), (9, 10),
-                                   (10, 11), (11, 12), (11, 13),
-                                   (13, 14), (14, 15)])
+        self.graph.add_nodes_from(list(range(16)))
+        self.graph.add_node('КР')
+        self.graph.add_node('П-тки')
+        self.graph.add_node('ДЗ')
+        self.graph.add_node('Сл-ке')
+        self.graph.add_node('Дніпро')
+        self.graph.add_node('НДВ')
+        self.graph.add_node('Павлоград')
+        self.graph.add_node('Ново-ївка')
+        self.graph.add_node('Синель-во')
+        self.graph.add_node('ЗП')
+
+        edges = [
+            (0, 'КР', 1),
+            (1, 'КР', 1),
+            (2, 'КР', 2),
+            (1, 'П-тки', 1),
+            (3, 'П-тки', 2),
+            (4, 'Дніпро', 2),
+            (6, 'Дніпро', 1),
+            (8, 'Дніпро', 3),
+            (7, 'Дніпро', 1),
+            (10, 'Дніпро', 2),
+            (11, 'Дніпро', 2),
+            (15, 'Дніпро', 3),
+            (6, 'ДЗ', 1),
+            (5, 'ДЗ', 1),
+            (5, 'Сл-ке', 1),
+            (7, 'Сл-ке', 1),
+            (15, 'НДВ', 3),
+            (15, 'ЗП', 1),
+            (14, 'ЗП', 1),
+            (11, 'Синель-во', 1),
+            (12, 'Синель-во', 2),
+            (14, 'Синель-во', 1),
+            (9, 'Ново-ївка', 1),
+            (10, 'Ново-ївка', 1),
+            (8, 'Павлоград', 1),
+            (9, 'Павлоград', 1),
+            (12, 'Павлоград', 1),
+            (13, 'Павлоград', 5),
+            (3, 4, 2),
+            (2, 4, 2),
+            (0, 13, 10),
+        ]
+        for start, end, length in edges:
+            self.graph.add_edge(start, end, length=length)
 
     def __init_tunnels(self):
         Tunnel = namedtuple('MPLSTunnel', 'index, qos, route')
@@ -139,15 +174,16 @@ class GraphUtil:
 
     def show_graph(self):
         pos = nx.spring_layout(self.graph)
-        nx.draw_networkx_nodes(self.graph, pos, node_size=700)
+        nx.draw_networkx_nodes(self.graph, pos, node_size=300)
 
         nx.draw_networkx_edges(self.graph, pos,
-                               width=2,
-                               alpha=0.5, edge_color='b', style='solid')
+                               width=1,
+                               alpha=0.6, edge_color='b', style='solid')
 
         # labels
         nx.draw_networkx_labels(
-            self.graph, pos, font_size=20, font_family='sans-serif')
+            self.graph, pos, font_size=14, font_family='sans-serif')
 
         plt.axis('off')
+        plt.savefig("Graph.png", format="PNG")
         plt.show()
