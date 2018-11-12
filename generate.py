@@ -15,8 +15,14 @@ ethernet_min_throughput = 1e2  # 100 bytes/s
 
 
 def generate_example_inputs(g):
+    gutil.clear_edges_load()
     while True:
         koefs = []
+        ran = random.randint(0, 5)
+        for edge in gutil.nodes_to_edges(gutil.tunnels_routes[ran]):
+            i, j = edge
+            g[i][j]['K'] += 0.1
+
         for ure in gutil.unique_routes_edges:
             route_load = []
             for edge in ure:
@@ -34,14 +40,16 @@ def generate_example_inputs(g):
             gutil.clear_edges_load()
             continue
 
-        intensity = []
-        intensity.append(random.randint(0, 4))
+        k_load = []
+
+        k_load.append(np.random.choice(['EF', 'BE', 'AF']))
 
         for edge in gutil.unique_edges_set:
             i, j = edge
-            intensity.append(g[i][j]['intensity'])
+            k_load.append(round(g[i][j]['K'], 3))
         break
-    return intensity
+
+    return k_load
 
 
 def generate_example_output(input):
@@ -86,16 +94,17 @@ def generate_dataset(m, filename):
         if i % 1000 == 0:
             print(cnt, '{}%'.format(int(np.floor(len(new_datas) / m * 100))))
 
+    m = examples_per_route * unique_routes_cnt
     with open(filename, 'w', newline='') as f:
         writer = csv.writer(f)
-        for i in range(m):
+        for i in range(m - 1):
             k = []
             k.append(new_labels[i])
             example = new_datas[i] + k
             writer.writerow(example)
 
 
-generate_dataset(3500, 'dataset2.csv')
+generate_dataset(100, 'dataset2.csv')
 
 with open('valid_routes.csv', 'w', newline='') as f:
     writer = csv.writer(f)
