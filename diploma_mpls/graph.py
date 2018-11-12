@@ -1,6 +1,7 @@
 import networkx as nx
 from collections import namedtuple
 import matplotlib.pyplot as plt
+import itertools
 
 
 class GraphUtil:
@@ -92,6 +93,11 @@ class GraphUtil:
                 if edge not in u:
                     u.append(edge)
         return u
+
+    @property
+    def destinations(self):
+        nodes = [node for node in self.graph.nodes() if isinstance(node, str)]
+        return list(itertools.combinations(nodes, 2))
 
     def nodes_to_edges(self, node_route):
         edges = []
