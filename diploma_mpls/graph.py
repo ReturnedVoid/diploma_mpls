@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 
 
 class GraphUtil:
-    SOURCE = 12
-    TARGET = 1
+    SOURCE = 'Дніпро'
+    TARGET = 'ЗП'
 
     def __init__(self):
         self.graph = nx.Graph()
@@ -51,7 +51,7 @@ class GraphUtil:
 
     @property
     def unique_routes_edges(self):
-        return [self._nodes_to_edges(route) for route in self.unique_routes]
+        return [self.nodes_to_edges(route) for route in self.unique_routes]
 
     @property
     def tunnels(self):
@@ -61,6 +61,7 @@ class GraphUtil:
         tunnels.append(self.tunnel3)
         tunnels.append(self.tunnel4)
         tunnels.append(self.tunnel5)
+        tunnels.append(self.tunnel6)
         return tunnels
 
     @property
@@ -92,7 +93,7 @@ class GraphUtil:
                     u.append(edge)
         return u
 
-    def _nodes_to_edges(self, node_route):
+    def nodes_to_edges(self, node_route):
         edges = []
         y = node_route[0]
         for i in range(1, len(node_route)):
@@ -103,7 +104,7 @@ class GraphUtil:
         return edges
 
     def get_route_load(self, path):
-        edge_path = self._nodes_to_edges(path)
+        edge_path = self.nodes_to_edges(path)
         load_koefs = []
         for i, u in edge_path:
             load_koefs.append(self.graph[i][u]['K'])
@@ -160,11 +161,12 @@ class GraphUtil:
 
     def __init_tunnels(self):
         Tunnel = namedtuple('MPLSTunnel', 'index, qos, route')
-        self.tunnel1 = Tunnel(0, 1, self.unique_routes[4])
-        self.tunnel2 = Tunnel(1, 2, self.unique_routes[1])
-        self.tunnel3 = Tunnel(2, 1, self.unique_routes[2])
-        self.tunnel4 = Tunnel(3, 3, self.unique_routes[7])
-        self.tunnel5 = Tunnel(4, 4, self.unique_routes[3])
+        self.tunnel1 = Tunnel(0, 'AF', self.unique_routes[0])
+        self.tunnel2 = Tunnel(1, 'AF', self.unique_routes[1])
+        self.tunnel3 = Tunnel(2, 'EF', self.unique_routes[2])
+        self.tunnel4 = Tunnel(3, 'EF', self.unique_routes[3])
+        self.tunnel5 = Tunnel(4, 'BE', self.unique_routes[4])
+        self.tunnel6 = Tunnel(5, 'BE', self.unique_routes[5])
 
     def clear_edges_load(self):
         for edge in self.graph.edges():
