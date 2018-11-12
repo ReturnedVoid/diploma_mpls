@@ -43,6 +43,8 @@ def generate_example_inputs(g):
         k_load = []
 
         k_load.append(np.random.choice(['EF', 'BE', 'AF']))
+        k_load.append(gutil.source)
+        k_load.append(gutil.target)
 
         for edge in gutil.unique_edges_set:
             i, j = edge
@@ -72,36 +74,40 @@ def generate_example():
 
 
 def generate_dataset(m, filename):
-    cnt = [0] * unique_routes_cnt
-    examples_per_route = m // unique_routes_cnt
-    print('Generating {} examples per route'.format(examples_per_route))
-    new_datas = []
-    new_labels = []
-    i = 0
+    for source, dest in gutil.destinations:
+        gutil.source = source
+        gutil.target = dest
+        cnt = [0] * unique_routes_cnt
+        examples_per_route = m // unique_routes_cnt
+        print('Generating {} examples per route'.format(examples_per_route))
+        new_datas = []
+        new_labels = []
+        i = 0
 
-    while True:
-        new_data, new_label = generate_example()
+        while True:
+            new_data, new_label = generate_example()
 
-        if cnt[new_label] < examples_per_route:
-            new_datas.append(new_data)
-            new_labels.append(new_label)
-            cnt[new_label] += 1
+            if cnt[new_label] < examples_per_route:
+                new_datas.append(new_data)
+                new_labels.append(new_label)
+                cnt[new_label] += 1
 
-        if len(new_datas) >= examples_per_route * unique_routes_cnt:
-            break
+            if len(new_datas) >= examples_per_route * unique_routes_cnt:
+                break
 
-        i += 1
-        if i % 1000 == 0:
-            print(cnt, '{}%'.format(int(np.floor(len(new_datas) / m * 100))))
+            i += 1
+            if i % 1000 == 0:
+                perc = int(np.floor(len(new_datas) / m * 100))
+                print(cnt, '{}%'.format(perc))
 
-    m = examples_per_route * unique_routes_cnt
-    with open(filename, 'w', newline='') as f:
-        writer = csv.writer(f)
-        for i in range(m - 1):
-            k = []
-            k.append(new_labels[i])
-            example = new_datas[i] + k
-            writer.writerow(example)
+        m = examples_per_route * unique_routes_cnt
+        with open(filename, 'a', newline='') as f:
+            writer = csv.writer(f)
+            for i in range(m):
+                k = []
+                k.append(new_labels[i])
+                example = new_datas[i] + k
+                writer.writerow(example)
 
 
-generate_dataset(100, 'dataset2.csv')
+generate_dataset(2400, 'dataset2.csv')
