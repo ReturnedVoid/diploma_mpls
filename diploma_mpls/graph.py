@@ -1,5 +1,6 @@
 import networkx as nx
 from collections import namedtuple
+import matplotlib.pyplot as plt
 
 
 class GraphUtil:
@@ -11,6 +12,7 @@ class GraphUtil:
         self.__init_edges()
         self.__init_tunnels()
         self.clear_edges_load()
+        self.show_graph()
 
     @property
     def graph(self):
@@ -134,3 +136,18 @@ class GraphUtil:
             i, j = edge
             self.graph[i][j]['K'] = 0
             self.graph[i][j]['intensity'] = 0
+
+    def show_graph(self):
+        pos = nx.spring_layout(self.graph)
+        nx.draw_networkx_nodes(self.graph, pos, node_size=700)
+
+        nx.draw_networkx_edges(self.graph, pos,
+                               width=2,
+                               alpha=0.5, edge_color='b', style='solid')
+
+        # labels
+        nx.draw_networkx_labels(
+            self.graph, pos, font_size=20, font_family='sans-serif')
+
+        plt.axis('off')
+        plt.show()
