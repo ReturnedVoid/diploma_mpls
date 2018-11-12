@@ -105,10 +105,3 @@ def generate_dataset(m, filename):
 
 
 generate_dataset(100, 'dataset2.csv')
-
-with open('valid_routes.csv', 'w', newline='') as f:
-    writer = csv.writer(f)
-    for r in range(unique_routes_cnt):
-        k = []
-        k.append(r)
-        writer.writerow(k)
