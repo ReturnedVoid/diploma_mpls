@@ -167,12 +167,12 @@ class GraphUtil:
 
     def __init_tunnels(self):
         Tunnel = namedtuple('MPLSTunnel', 'index, qos, route')
-        self.tunnel1 = Tunnel(0, 'AF', self.unique_routes[0])
-        self.tunnel2 = Tunnel(1, 'AF', self.unique_routes[1])
-        self.tunnel3 = Tunnel(2, 'EF', self.unique_routes[2])
-        self.tunnel4 = Tunnel(3, 'EF', self.unique_routes[3])
-        self.tunnel5 = Tunnel(4, 'BE', self.unique_routes[4])
-        self.tunnel6 = Tunnel(5, 'BE', self.unique_routes[5])
+        self.tunnel1 = Tunnel(0, 'CS0', self.unique_routes[0])
+        self.tunnel2 = Tunnel(1, 'CS0', self.unique_routes[1])
+        self.tunnel3 = Tunnel(2, 'CS1', self.unique_routes[2])
+        self.tunnel4 = Tunnel(3, 'CS1', self.unique_routes[3])
+        self.tunnel5 = Tunnel(4, 'CS2', self.unique_routes[4])
+        self.tunnel6 = Tunnel(5, 'CS2', self.unique_routes[5])
 
     def clear_edges_load(self):
         for edge in self.graph.edges():

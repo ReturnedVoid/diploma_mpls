@@ -42,7 +42,7 @@ def generate_example_inputs(g):
 
         k_load = []
 
-        k_load.append(np.random.choice(['EF', 'BE', 'AF']))
+        k_load.append(np.random.choice(['CS0', 'CS1', 'CS2']))
         k_load.append(gutil.source)
         k_load.append(gutil.target)
 
