@@ -10,6 +10,7 @@ class GraphUtil:
 
     def __init__(self):
         self.graph = nx.Graph()
+        self.__init_destination()
         self.__init_edges()
         self.__init_tunnels()
         self.clear_edges_load()
@@ -42,7 +43,7 @@ class GraphUtil:
     @property
     def unique_routes(self):
         unique_routes = list(nx.all_simple_paths(
-            self.graph, source=self.SOURCE, target=self.TARGET))
+            self.graph, source=self.source, target=self.target))
         unique_routes.sort(key=len)
         return unique_routes
 
@@ -173,6 +174,10 @@ class GraphUtil:
         self.tunnel4 = Tunnel(3, 'CS1', self.unique_routes[3])
         self.tunnel5 = Tunnel(4, 'CS2', self.unique_routes[4])
         self.tunnel6 = Tunnel(5, 'CS2', self.unique_routes[5])
+
+    def __init_destination(self):
+        self.source = self.SOURCE
+        self.target = self.TARGET
 
     def clear_edges_load(self):
         for edge in self.graph.edges():
