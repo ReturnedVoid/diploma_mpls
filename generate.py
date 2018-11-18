@@ -77,6 +77,8 @@ def generate_dataset(m, filename):
     for source, dest in gutil.destinations:
         gutil.source = source
         gutil.target = dest
+        # maybe i need to get cnt for every destination
+        # unique_routes_cnt = gutil.unique_routes_cnt
         cnt = [0] * unique_routes_cnt
         examples_per_route = m // unique_routes_cnt
         print('Generating {} examples per route'.format(examples_per_route))
@@ -96,7 +98,7 @@ def generate_dataset(m, filename):
                 break
 
             i += 1
-            if i % 1000 == 0:
+            if i % 10000 == 0:
                 perc = int(np.floor(len(new_datas) / m * 100))
                 print(cnt, '{}%'.format(perc))
 
