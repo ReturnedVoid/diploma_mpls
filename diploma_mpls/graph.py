@@ -3,7 +3,6 @@ from collections import namedtuple
 import matplotlib.pyplot as plt
 import itertools
 import numpy as np
-import random
 
 ethernet_max_packet_size = 1518 + 12 + 8
 ethernet_max_throughput = 125e5  # 100 MB/s
@@ -13,7 +12,7 @@ Tunnel = namedtuple('MPLSTunnel', 'index, qos, route invroute load')
 
 class GraphUtil:
     SOURCE = 'ДЗ'
-    TARGET = 'Дніпро'
+    TARGET = 'Мик-вка'
 
     def __init__(self):
         self.graph = nx.Graph()
@@ -105,7 +104,8 @@ class GraphUtil:
 
     @property
     def tunnels_load(self):
-        return [tun.load for tun in self.tunnels]
+        return [round(self.get_route_load(tun.route), 2)
+                for tun in self.tunnels]
 
     @property
     def tunnels_routes(self):
@@ -237,7 +237,7 @@ class GraphUtil:
             # ran = random.randint(0, 4)
             # for edge in self.nodes_to_edges(self.tunnels_routes[0][0]):
             #     i, j = edge
-            #     self.graph[i][j]['K'] += 0.1
+            #     self.graph[i][j]['K'] += 0.005
 
             for tun in self.tunnels:
                 tunnel_load = []
@@ -250,23 +250,15 @@ class GraphUtil:
                     self.graph[i][j]['intensity'] += inten
                     self.graph[i][j]['K'] += k_load
 
-            load = []
-            for tun in self.tunnels:
-                temp = []
-                for edge in self.nodes_to_edges(tun.route):
-                    x, y = edge
-                    temp.append(self.graph[x][y]['K'])
-
-                load.append(round(sum(temp), 2))
-            
-            if max(load) >= 0.1:
+            if max(self.tunnels_load) >= 0.1:
                 self.clear_edges_load()
                 continue
 
             for i in range(self.tunnels_cnt):
                 tunnel = self.tunnels[i]
                 tunnel = Tunnel(tunnel.index, tunnel.qos,
-                                tunnel.route, tunnel.invroute, load[i])
+                                tunnel.route, tunnel.invroute,
+                                self.tunnels_load[i])
                 self.tuns[i] = tunnel
 
             break
