@@ -104,8 +104,15 @@ class GraphUtil:
 
     @property
     def tunnels_load(self):
-        return [round(self.get_route_load(tun.route), 2)
+        return [round(tun.load, 2)
                 for tun in self.tunnels]
+
+    def add_load(self, index, load):
+        tunnel = self.tunnels[index]
+        tunnel = Tunnel(tunnel.index, tunnel.qos,
+                        tunnel.route, tunnel.invroute,
+                        tunnel.load + load)
+        self.tuns[index] = tunnel
 
     @property
     def tunnels_routes(self):
@@ -240,15 +247,16 @@ class GraphUtil:
             #     self.graph[i][j]['K'] += 0.005
 
             for tun in self.tunnels:
-                tunnel_load = []
-                for edge in self.nodes_to_edges(tun.route):
-                    i, j = edge
-                    inten = np.random.uniform(
-                        ethernet_min_throughput, ethernet_max_throughput // 20)
-                    k_load = inten / ethernet_max_throughput
-                    tunnel_load.append(k_load)
-                    self.graph[i][j]['intensity'] += inten
-                    self.graph[i][j]['K'] += k_load
+                self.add_load(tun.index, round(
+                    np.random.uniform(0.04, 0.1), 2))
+                # for edge in self.nodes_to_edges(tun.route):
+                #     i, j = edge
+                #     inten = np.random.uniform(
+                #         ethernet_min_throughput, ethernet_max_throughput // 20)
+                #     k_load = inten / ethernet_max_throughput
+                #     tunnel_load.append(k_load)
+                #     self.graph[i][j]['intensity'] += inten
+                #     self.graph[i][j]['K'] += k_load
 
             if max(self.tunnels_load) >= 0.1:
                 self.clear_edges_load()
@@ -276,7 +284,7 @@ class GraphUtil:
         for i in range(self.tunnels_cnt):
             tun = self.tunnels[i]
             tun = Tunnel(tun.index, tun.qos, tun.route, tun.invroute, 0.0)
-            self.tunnels[i] = tun
+            self.tuns[i] = tun
 
     def show_graph(self):
         pos = nx.spring_layout(self.graph)
