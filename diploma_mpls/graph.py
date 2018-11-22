@@ -234,39 +234,34 @@ class GraphUtil:
     def __init_network_load(self):
         self.clear_edges_load()
         while True:
-            koefs = []
-            ran = random.randint(0, 4)
-            for edge in self.nodes_to_edges(self.tunnels_routes[0][ran]):
-                i, j = edge
-                self.graph[i][j]['K'] += 0.1
+            # ran = random.randint(0, 4)
+            # for edge in self.nodes_to_edges(self.tunnels_routes[0][0]):
+            #     i, j = edge
+            #     self.graph[i][j]['K'] += 0.1
 
             for tun in self.tunnels:
-                route_load = []
+                tunnel_load = []
                 for edge in self.nodes_to_edges(tun.route):
                     i, j = edge
                     inten = np.random.uniform(
-                        ethernet_min_throughput, ethernet_max_throughput // 30)
+                        ethernet_min_throughput, ethernet_max_throughput // 20)
                     k_load = inten / ethernet_max_throughput
-                    route_load.append(k_load)
+                    tunnel_load.append(k_load)
                     self.graph[i][j]['intensity'] += inten
                     self.graph[i][j]['K'] += k_load
-                koefs.append(sum(route_load))
-            k = max(koefs)
-
-            if k >= 0.2:
-                self.clear_edges_load()
-                continue
 
             load = []
             for tun in self.tunnels:
-                y = tun.route[0]
                 temp = []
-                for i in range(1, len(tun.route)):
-                    x = y
-                    y = tun.route[i]
+                for edge in self.nodes_to_edges(tun.route):
+                    x, y = edge
                     temp.append(self.graph[x][y]['K'])
 
                 load.append(round(sum(temp), 2))
+            
+            if max(load) >= 0.1:
+                self.clear_edges_load()
+                continue
 
             for i in range(self.tunnels_cnt):
                 tunnel = self.tunnels[i]
@@ -285,6 +280,11 @@ class GraphUtil:
             i, j = edge
             self.graph[i][j]['K'] = 0
             self.graph[i][j]['intensity'] = 0
+
+        for i in range(self.tunnels_cnt):
+            tun = self.tunnels[i]
+            tun = Tunnel(tun.index, tun.qos, tun.route, tun.invroute, 0.0)
+            self.tunnels[i] = tun
 
     def show_graph(self):
         pos = nx.spring_layout(self.graph)
