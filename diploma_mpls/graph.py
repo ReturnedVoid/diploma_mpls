@@ -5,8 +5,8 @@ import itertools
 
 
 class GraphUtil:
-    SOURCE = 'Дніпро'
-    TARGET = 'ЗП'
+    SOURCE = 'ДЗ'
+    TARGET = 'Дніпро'
 
     def __init__(self):
         self.graph = nx.Graph()
@@ -14,7 +14,6 @@ class GraphUtil:
         self.__init_edges()
         self.__init_tunnels()
         self.clear_edges_load()
-        self.show_graph()
 
     @property
     def graph(self):
@@ -42,8 +41,42 @@ class GraphUtil:
 
     @property
     def unique_routes(self):
+        route = []
+        forward, backward = self.destinations
+
+        for i in range(self.tunnels_cnt):
+            temp = []
+            if (self.source, self.target) in forward:
+                to = self.routes(self.source, 'Дніпро')
+                if not to:
+                    to.append(self.source)
+                else:
+                    to = to[0]
+                temp.append(list(itertools.chain(
+                    to, self.tunnels[i].route[1:])))
+
+                if self.target != self.tunnels[i].route[-1]:
+                    temp[0].append(self.target)
+
+            else:
+                to = self.routes(self.source, 'Павлоград')
+                if not to:
+                    to.append(self.source)
+                else:
+                    to = to[0]
+                temp.append(list(itertools.chain(
+                    to, self.tunnels[i].invroute[1:])))
+
+                if self.target != self.tunnels[i].invroute[-1]:
+                    temp[0].append(self.target)
+
+            route.append(temp[0])
+            temp.clear()
+        return route
+
+    def routes(self, s, t):
         unique_routes = list(nx.all_simple_paths(
-            self.graph, source=self.source, target=self.target))
+            self.graph, source=s, target=t))
         unique_routes.sort(key=len)
         return unique_routes
 
@@ -63,7 +96,6 @@ class GraphUtil:
         tunnels.append(self.tunnel3)
         tunnels.append(self.tunnel4)
         tunnels.append(self.tunnel5)
-        tunnels.append(self.tunnel6)
         return tunnels
 
     @property
@@ -97,8 +129,18 @@ class GraphUtil:
 
     @property
     def destinations(self):
-        nodes = [node for node in self.graph.nodes() if isinstance(node, str)]
-        return list(itertools.combinations(nodes, 2))
+        forward = [
+            ('ДЗ', 'Павлоград'),
+            ('ДЗ', 'Мик-вка'),
+            ('П-тки', 'Павлоград'),
+            ('П-тки', 'Мик-вка'),
+            ('КР', 'Павлоград'),
+            ('КР', 'Мик-вка'),
+            ('Дніпро', 'Павлоград'),
+            ('Дніпро', 'Мик-вка'),
+        ]
+        backward = [(dest[1], dest[0]) for dest in forward]
+        return forward, backward
 
     def nodes_to_edges(self, node_route):
         edges = []
@@ -118,7 +160,7 @@ class GraphUtil:
         return sum(load_koefs)
 
     def __init_edges(self):
-        self.graph.add_nodes_from(list(range(1, 6)))
+        self.graph.add_nodes_from(list(range(1, 4)))
         self.graph.add_node('КР')
         self.graph.add_node('П-тки')
         self.graph.add_node('ДЗ')
@@ -133,7 +175,7 @@ class GraphUtil:
 
         edges = [
             ('КР', 'П-тки'),
-            ('КР', 5),
+            # ('КР', 5),
             ('КР', 'Дніпро'),
             ('П-тки', 1),
             ('П-тки', 'Дніпро'),
@@ -148,8 +190,8 @@ class GraphUtil:
             (4, 'Павлоград'),
             ('Павлоград', 3),
             (3, 'Мик-вка'),
-            ('Павлоград', 6),
-            (6, 5),
+            # ('Павлоград', 6),
+            # (6, 5),
             ('ЗП', 'Синель-во'),
             ('Синель-во', 'Павлоград'),
             ('Синель-во', 'НДВ'),
@@ -160,13 +202,19 @@ class GraphUtil:
             self.graph.add_edge(start, end)
 
     def __init_tunnels(self):
-        Tunnel = namedtuple('MPLSTunnel', 'index, qos, route')
-        self.tunnel1 = Tunnel(0, 'CS0', self.unique_routes[0])
-        self.tunnel2 = Tunnel(1, 'CS0', self.unique_routes[1])
-        self.tunnel3 = Tunnel(2, 'CS1', self.unique_routes[2])
-        self.tunnel4 = Tunnel(3, 'CS1', self.unique_routes[3])
-        self.tunnel5 = Tunnel(4, 'CS2', self.unique_routes[4])
-        self.tunnel6 = Tunnel(5, 'CS2', self.unique_routes[5])
+        Tunnel = namedtuple('MPLSTunnel', 'index, qos, route invroute')
+        s = 'Дніпро'
+        t = 'Павлоград'
+        self.tunnel1 = Tunnel(
+            0, 'CS0', self.routes(s, t)[0], self.routes(s, t)[0][:: -1])
+        self.tunnel2 = Tunnel(
+            1, 'CS0', self.routes(s, t)[1], self.routes(s, t)[1][:: -1])
+        self.tunnel3 = Tunnel(
+            2, 'CS1', self.routes(s, t)[2], self.routes(s, t)[2][:: -1])
+        self.tunnel4 = Tunnel(
+            3, 'CS1', self.routes(s, t)[3], self.routes(s, t)[3][:: -1])
+        self.tunnel5 = Tunnel(
+            4, 'CS2', self.routes(s, t)[4], self.routes(s, t)[4][:: -1])
 
     def __init_destination(self):
         self.source = self.SOURCE
