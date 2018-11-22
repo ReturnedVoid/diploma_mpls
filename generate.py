@@ -18,7 +18,7 @@ def generate_example_inputs(g, util):
     sample.append(gutil.source)
     sample.append(gutil.target)
 
-    threads = [round(np.random.uniform(1, 6), 2) for _ in range(15)]
+    threads = [round(np.random.uniform(1, 15), 2) for _ in range(15)]
     for k in gutil.tunnels_load:
         sample.append(k)
     for thread in threads:
@@ -28,6 +28,8 @@ def generate_example_inputs(g, util):
 
 
 def generate_example_output(input):
+    coses = ['CS0', 'CS1', 'CS2']
+
     threads = input[8:]
     cnt = [0] * len(threads)
 
@@ -36,7 +38,15 @@ def generate_example_output(input):
         d = [(t, gutil.tunnels_load[t.index]) for t in tuns]
         print(gutil.tunnels_load)
         best_tunnel = min(d, key=lambda x: x[1])[0]
-        gutil.add_load(best_tunnel.index, threads[i] / 100)
+        # best_tunnel = 
+        if gutil.add_load(best_tunnel.index, threads[i] / 100).load >= 0.65:
+            index = coses.index(best_tunnel.qos)
+            if index - 1 != -1:
+                index -= 1
+
+            tuns = [t for t in gutil.tunnels if t.qos == coses[index]]
+            d = [(t, gutil.tunnels_load[t.index]) for t in tuns]
+            best_tunnel = min(d, key=lambda x: x[1])[0]
         cnt[i] = best_tunnel.index
     print(cnt)
     sys.exit()

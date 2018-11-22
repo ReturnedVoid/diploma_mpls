@@ -113,6 +113,7 @@ class GraphUtil:
                         tunnel.route, tunnel.invroute,
                         tunnel.load + load)
         self.tuns[index] = tunnel
+        return self.tuns[index]
 
     @property
     def tunnels_routes(self):
@@ -241,22 +242,9 @@ class GraphUtil:
     def __init_network_load(self):
         self.clear_edges_load()
         while True:
-            # ran = random.randint(0, 4)
-            # for edge in self.nodes_to_edges(self.tunnels_routes[0][0]):
-            #     i, j = edge
-            #     self.graph[i][j]['K'] += 0.005
-
             for tun in self.tunnels:
                 self.add_load(tun.index, round(
                     np.random.uniform(0.04, 0.1), 2))
-                # for edge in self.nodes_to_edges(tun.route):
-                #     i, j = edge
-                #     inten = np.random.uniform(
-                #         ethernet_min_throughput, ethernet_max_throughput // 20)
-                #     k_load = inten / ethernet_max_throughput
-                #     tunnel_load.append(k_load)
-                #     self.graph[i][j]['intensity'] += inten
-                #     self.graph[i][j]['K'] += k_load
 
             if max(self.tunnels_load) >= 0.1:
                 self.clear_edges_load()
