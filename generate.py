@@ -1,4 +1,3 @@
-import numpy as np
 import csv
 import random
 from diploma_mpls.graph import GraphUtil
@@ -9,47 +8,13 @@ unique_routes = gutil.unique_routes
 unique_routes_cnt = gutil.unique_routes_cnt
 mpls_graph = gutil.graph
 
-ethernet_max_packet_size = 1518 + 12 + 8
-ethernet_max_throughput = 125e5  # 100 MB/s
-ethernet_min_throughput = 1e2  # 100 bytes/s
-
 
 def generate_example_inputs(g):
-    gutil.clear_edges_load()
-    while True:
-        koefs = []
-        ran = random.randint(0, 5)
-        for edge in gutil.nodes_to_edges(gutil.tunnels_routes[ran]):
-            i, j = edge
-            g[i][j]['K'] += 0.1
-
-        for ure in gutil.unique_routes_edges:
-            route_load = []
-            for edge in ure:
-                i, j = edge
-                inten = np.random.uniform(
-                    ethernet_min_throughput, ethernet_max_throughput // 15)
-                k_load = inten / ethernet_max_throughput
-                route_load.append(k_load)
-                g[i][j]['intensity'] += inten
-                g[i][j]['K'] += k_load
-            koefs.append(sum(route_load))
-        k = max(koefs)
-
-        if k >= 0.65:
-            gutil.clear_edges_load()
-            continue
-
         k_load = []
 
         k_load.append(np.random.choice(['CS0', 'CS1', 'CS2']))
         k_load.append(gutil.source)
         k_load.append(gutil.target)
-
-        for edge in gutil.unique_edges_set:
-            i, j = edge
-            k_load.append(round(g[i][j]['K'], 3))
-        break
 
     return k_load
 

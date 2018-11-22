@@ -2,6 +2,13 @@ import networkx as nx
 from collections import namedtuple
 import matplotlib.pyplot as plt
 import itertools
+import numpy as np
+import random
+
+ethernet_max_packet_size = 1518 + 12 + 8
+ethernet_max_throughput = 125e5  # 100 MB/s
+ethernet_min_throughput = 1e2  # 100 bytes/s
+Tunnel = namedtuple('MPLSTunnel', 'index, qos, route invroute load')
 
 
 class GraphUtil:
@@ -13,7 +20,7 @@ class GraphUtil:
         self.__init_destination()
         self.__init_edges()
         self.__init_tunnels()
-        self.clear_edges_load()
+        self.__init_network_load()
 
     @property
     def graph(self):
@@ -90,21 +97,23 @@ class GraphUtil:
 
     @property
     def tunnels(self):
-        tunnels = []
-        tunnels.append(self.tunnel1)
-        tunnels.append(self.tunnel2)
-        tunnels.append(self.tunnel3)
-        tunnels.append(self.tunnel4)
-        tunnels.append(self.tunnel5)
-        return tunnels
+        return self.tuns
 
     @property
     def tunnels_cnt(self):
         return len(self.tunnels)
 
     @property
+    def tunnels_load(self):
+        return [tun.load for tun in self.tunnels]
+
+    @property
     def tunnels_routes(self):
-        return [t.route for t in self.tunnels]
+        s = 'Дніпро'
+        t = 'Павлоград'
+        routes = [self.routes(s, t)[i] for i in range(5)]
+        invroutes = [self.routes(s, t)[i][:: -1] for i in range(5)]
+        return routes, invroutes
 
     @property
     def routes_with_index(self):
@@ -202,19 +211,70 @@ class GraphUtil:
             self.graph.add_edge(start, end)
 
     def __init_tunnels(self):
-        Tunnel = namedtuple('MPLSTunnel', 'index, qos, route invroute')
         s = 'Дніпро'
         t = 'Павлоград'
-        self.tunnel1 = Tunnel(
-            0, 'CS0', self.routes(s, t)[0], self.routes(s, t)[0][:: -1])
-        self.tunnel2 = Tunnel(
-            1, 'CS0', self.routes(s, t)[1], self.routes(s, t)[1][:: -1])
-        self.tunnel3 = Tunnel(
-            2, 'CS1', self.routes(s, t)[2], self.routes(s, t)[2][:: -1])
-        self.tunnel4 = Tunnel(
-            3, 'CS1', self.routes(s, t)[3], self.routes(s, t)[3][:: -1])
-        self.tunnel5 = Tunnel(
-            4, 'CS2', self.routes(s, t)[4], self.routes(s, t)[4][:: -1])
+        tunnel1 = Tunnel(
+            0, 'CS0', self.routes(s, t)[0], self.routes(s, t)[0][:: -1], 0)
+        tunnel2 = Tunnel(
+            1, 'CS0', self.routes(s, t)[1], self.routes(s, t)[1][:: -1], 0)
+        tunnel3 = Tunnel(
+            2, 'CS1', self.routes(s, t)[2], self.routes(s, t)[2][:: -1], 0)
+        tunnel4 = Tunnel(
+            3, 'CS1', self.routes(s, t)[3], self.routes(s, t)[3][:: -1], 0)
+        tunnel5 = Tunnel(
+            4, 'CS2', self.routes(s, t)[4], self.routes(s, t)[4][:: -1], 0)
+
+        self.tuns = []
+        self.tuns.append(tunnel1)
+        self.tuns.append(tunnel2)
+        self.tuns.append(tunnel3)
+        self.tuns.append(tunnel4)
+        self.tuns.append(tunnel5)
+
+    def __init_network_load(self):
+        self.clear_edges_load()
+        while True:
+            koefs = []
+            ran = random.randint(0, 4)
+            for edge in self.nodes_to_edges(self.tunnels_routes[0][ran]):
+                i, j = edge
+                self.graph[i][j]['K'] += 0.1
+
+            for tun in self.tunnels:
+                route_load = []
+                for edge in self.nodes_to_edges(tun.route):
+                    i, j = edge
+                    inten = np.random.uniform(
+                        ethernet_min_throughput, ethernet_max_throughput // 30)
+                    k_load = inten / ethernet_max_throughput
+                    route_load.append(k_load)
+                    self.graph[i][j]['intensity'] += inten
+                    self.graph[i][j]['K'] += k_load
+                koefs.append(sum(route_load))
+            k = max(koefs)
+
+            if k >= 0.2:
+                self.clear_edges_load()
+                continue
+
+            load = []
+            for tun in self.tunnels:
+                y = tun.route[0]
+                temp = []
+                for i in range(1, len(tun.route)):
+                    x = y
+                    y = tun.route[i]
+                    temp.append(self.graph[x][y]['K'])
+
+                load.append(round(sum(temp), 2))
+
+            for i in range(self.tunnels_cnt):
+                tunnel = self.tunnels[i]
+                tunnel = Tunnel(tunnel.index, tunnel.qos,
+                                tunnel.route, tunnel.invroute, load[i])
+                self.tuns[i] = tunnel
+
+            break
 
     def __init_destination(self):
         self.source = self.SOURCE
