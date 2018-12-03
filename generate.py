@@ -82,8 +82,9 @@ def generate_dataset(m, filename):
             for i in range(m):
                 k = []
                 k.append(outputs[i])
-                example = inputs[i] + k
-                writer.writerow(example)
+                for out in outputs[i]:
+                    inputs[i].append(out)
+                writer.writerow(inputs[i])
 
 
-generate_dataset(100, 'dataset2.csv')
+generate_dataset(10, 'dataset2.csv')
