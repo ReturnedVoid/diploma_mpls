@@ -19,7 +19,7 @@ class GraphUtil:
         self.__init_destination()
         self.__init_edges()
         self.__init_tunnels()
-        self.__init_network_load()
+        self.init_network_load()
 
     @property
     def graph(self):
@@ -192,7 +192,6 @@ class GraphUtil:
 
         edges = [
             ('КР', 'П-тки'),
-            # ('КР', 5),
             ('КР', 'Дніпро'),
             ('П-тки', 1),
             ('П-тки', 'Дніпро'),
@@ -207,8 +206,6 @@ class GraphUtil:
             (4, 'Павлоград'),
             ('Павлоград', 3),
             (3, 'Мик-вка'),
-            # ('Павлоград', 6),
-            # (6, 5),
             ('ЗП', 'Синель-во'),
             ('Синель-во', 'Павлоград'),
             ('Синель-во', 'НДВ'),
@@ -239,7 +236,7 @@ class GraphUtil:
         self.tuns.append(tunnel4)
         self.tuns.append(tunnel5)
 
-    def __init_network_load(self):
+    def init_network_load(self):
         self.clear_edges_load()
         while True:
             for tun in self.tunnels:
