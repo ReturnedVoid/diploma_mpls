@@ -14,11 +14,11 @@ ethernet_max_throughput = 125e5  # 100 MB/s
 def generate_example_inputs(g, util):
 
     sample = []
-    sample.append(np.random.choice(['CS0', 'CS1', 'CS2']))
+    sample.append(np.random.choice(list(range(8))))
     sample.append(gutil.source)
     sample.append(gutil.target)
 
-    threads = [round(np.random.uniform(1, 15), 2) for _ in range(15)]
+    threads = [round(np.random.uniform(1, 8), 2) for _ in range(15)]
     for k in gutil.tunnels_load:
         sample.append(k)
     for thread in threads:
@@ -27,31 +27,33 @@ def generate_example_inputs(g, util):
     return sample
 
 
-def generate_example_output(input):
-    coses = ['CS0', 'CS1', 'CS2']
-
-    threads = input[8:]
+def generate_example_output(sample):
+    coses = list(range(8))
+    current_cos = sample[0]
+    threads = sample[8:]
     cnt = [0] * len(threads)
 
-    tuns = [t for t in gutil.tunnels if t.qos == input[0]]
+    # if traffic class >= max tunnel class
+    if current_cos >= 2:
+        current_cos = 2
+
+    tuns = [t for t in gutil.tunnels if t.cos == current_cos]
     for i in range(len(threads)):
         d = [(t, gutil.tunnels_load[t.index]) for t in tuns]
         print(gutil.tunnels_load)
         best_tunnel = min(d, key=lambda x: x[1])[0]
-        # best_tunnel = 
+
         if gutil.add_load(best_tunnel.index, threads[i] / 100).load >= 0.65:
-            index = coses.index(best_tunnel.qos)
+            index = coses.index(best_tunnel.cos)
             if index - 1 != -1:
                 index -= 1
 
-            tuns = [t for t in gutil.tunnels if t.qos == coses[index]]
+            tuns = [t for t in gutil.tunnels if t.cos == coses[index]]
             d = [(t, gutil.tunnels_load[t.index]) for t in tuns]
             best_tunnel = min(d, key=lambda x: x[1])[0]
         cnt[i] = best_tunnel.index
-    print(cnt)
-    sys.exit()
 
-    return best_tunnel.index
+    return cnt
 
 
 def generate_example(util):

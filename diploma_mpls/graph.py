@@ -7,7 +7,7 @@ import numpy as np
 ethernet_max_packet_size = 1518 + 12 + 8
 ethernet_max_throughput = 125e5  # 100 MB/s
 ethernet_min_throughput = 1e2  # 100 bytes/s
-Tunnel = namedtuple('MPLSTunnel', 'index, qos, route invroute load')
+Tunnel = namedtuple('MPLSTunnel', 'index, cos, route invroute load')
 
 
 class GraphUtil:
@@ -109,7 +109,7 @@ class GraphUtil:
 
     def add_load(self, index, load):
         tunnel = self.tunnels[index]
-        tunnel = Tunnel(tunnel.index, tunnel.qos,
+        tunnel = Tunnel(tunnel.index, tunnel.cos,
                         tunnel.route, tunnel.invroute,
                         tunnel.load + load)
         self.tuns[index] = tunnel
@@ -222,15 +222,15 @@ class GraphUtil:
         s = 'Дніпро'
         t = 'Павлоград'
         tunnel1 = Tunnel(
-            0, 'CS0', self.routes(s, t)[0], self.routes(s, t)[0][:: -1], 0)
+            0, 0, self.routes(s, t)[0], self.routes(s, t)[0][:: -1], 0)
         tunnel2 = Tunnel(
-            1, 'CS0', self.routes(s, t)[1], self.routes(s, t)[1][:: -1], 0)
+            1, 0, self.routes(s, t)[1], self.routes(s, t)[1][:: -1], 0)
         tunnel3 = Tunnel(
-            2, 'CS1', self.routes(s, t)[2], self.routes(s, t)[2][:: -1], 0)
+            2, 1, self.routes(s, t)[2], self.routes(s, t)[2][:: -1], 0)
         tunnel4 = Tunnel(
-            3, 'CS1', self.routes(s, t)[3], self.routes(s, t)[3][:: -1], 0)
+            3, 1, self.routes(s, t)[3], self.routes(s, t)[3][:: -1], 0)
         tunnel5 = Tunnel(
-            4, 'CS2', self.routes(s, t)[4], self.routes(s, t)[4][:: -1], 0)
+            4, 2, self.routes(s, t)[4], self.routes(s, t)[4][:: -1], 0)
 
         self.tuns = []
         self.tuns.append(tunnel1)
@@ -252,7 +252,7 @@ class GraphUtil:
 
             for i in range(self.tunnels_cnt):
                 tunnel = self.tunnels[i]
-                tunnel = Tunnel(tunnel.index, tunnel.qos,
+                tunnel = Tunnel(tunnel.index, tunnel.cos,
                                 tunnel.route, tunnel.invroute,
                                 self.tunnels_load[i])
                 self.tuns[i] = tunnel
@@ -271,7 +271,7 @@ class GraphUtil:
 
         for i in range(self.tunnels_cnt):
             tun = self.tunnels[i]
-            tun = Tunnel(tun.index, tun.qos, tun.route, tun.invroute, 0.0)
+            tun = Tunnel(tun.index, tun.cos, tun.route, tun.invroute, 0.0)
             self.tuns[i] = tun
 
     def show_graph(self):
