@@ -241,9 +241,9 @@ class GraphUtil:
         while True:
             for tun in self.tunnels:
                 self.add_load(tun.index, round(
-                    np.random.uniform(0.04, 0.1), 2))
+                    np.random.uniform(0.04, 0.2), 2))
 
-            if max(self.tunnels_load) >= 0.1:
+            if max(self.tunnels_load) >= 0.2:
                 self.clear_edges_load()
                 continue
 
