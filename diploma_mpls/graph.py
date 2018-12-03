@@ -11,8 +11,8 @@ Tunnel = namedtuple('MPLSTunnel', 'index, cos, route invroute load')
 
 
 class GraphUtil:
-    SOURCE = 'ДЗ'
-    TARGET = 'Мик-вка'
+    SOURCE = 7
+    TARGET = 10
 
     def __init__(self):
         self.graph = nx.Graph()
@@ -53,7 +53,7 @@ class GraphUtil:
         for i in range(self.tunnels_cnt):
             temp = []
             if (self.source, self.target) in forward:
-                to = self.routes(self.source, 'Дніпро')
+                to = self.routes(self.source, 8)
                 if not to:
                     to.append(self.source)
                 else:
@@ -65,7 +65,7 @@ class GraphUtil:
                     temp[0].append(self.target)
 
             else:
-                to = self.routes(self.source, 'Павлоград')
+                to = self.routes(self.source, 11)
                 if not to:
                     to.append(self.source)
                 else:
@@ -117,8 +117,8 @@ class GraphUtil:
 
     @property
     def tunnels_routes(self):
-        s = 'Дніпро'
-        t = 'Павлоград'
+        s = 8
+        t = 11
         routes = [self.routes(s, t)[i] for i in range(5)]
         invroutes = [self.routes(s, t)[i][:: -1] for i in range(5)]
         return routes, invroutes
@@ -147,14 +147,14 @@ class GraphUtil:
     @property
     def destinations(self):
         forward = [
-            ('ДЗ', 'Павлоград'),
-            ('ДЗ', 'Мик-вка'),
-            ('П-тки', 'Павлоград'),
-            ('П-тки', 'Мик-вка'),
-            ('КР', 'Павлоград'),
-            ('КР', 'Мик-вка'),
-            ('Дніпро', 'Павлоград'),
-            ('Дніпро', 'Мик-вка'),
+            (7, 11),
+            (7, 10),
+            (6, 11),
+            (6, 10),
+            (5, 11),
+            (5, 10),
+            (8, 11),
+            (8, 10),
         ]
         backward = [(dest[1], dest[0]) for dest in forward]
         return forward, backward
@@ -177,47 +177,47 @@ class GraphUtil:
         return sum(load_koefs)
 
     def __init_edges(self):
-        self.graph.add_nodes_from(list(range(1, 4)))
-        self.graph.add_node('КР')
-        self.graph.add_node('П-тки')
-        self.graph.add_node('ДЗ')
-        self.graph.add_node('Мик-вка')
-        self.graph.add_node('Дніпро')
-        self.graph.add_node('НДВ')
-        self.graph.add_node('Павлоград')
-        self.graph.add_node('Ново-ївка')
-        self.graph.add_node('Синель-во')
-        self.graph.add_node('ЗП')
-        self.graph.add_node('Славгород')
+        self.graph.add_nodes_from(list(range(15)))
+        self.graph.add_node(5)
+        self.graph.add_node(6)
+        self.graph.add_node(7)
+        self.graph.add_node(10)
+        self.graph.add_node(8)
+        self.graph.add_node(9)
+        self.graph.add_node(11)
+        self.graph.add_node(12)
+        self.graph.add_node(13)
+        self.graph.add_node(15)
+        self.graph.add_node(14)
 
         edges = [
-            ('КР', 'П-тки'),
-            ('КР', 'Дніпро'),
-            ('П-тки', 1),
-            ('П-тки', 'Дніпро'),
-            (1, 'ДЗ'),
-            ('ДЗ', 2),
-            (2, 'Дніпро'),
-            ('Дніпро', 'НДВ'),
-            ('Дніпро', 'Ново-ївка'),
-            ('Дніпро', 'ЗП'),
-            ('Дніпро', 'Синель-во'),
-            ('Ново-ївка', 4),
-            (4, 'Павлоград'),
-            ('Павлоград', 3),
-            (3, 'Мик-вка'),
-            ('ЗП', 'Синель-во'),
-            ('Синель-во', 'Павлоград'),
-            ('Синель-во', 'НДВ'),
-            ('ЗП', 'Славгород'),
-            ('Славгород', 'Синель-во')
+            (5, 6),
+            (5, 8),
+            (6, 1),
+            (6, 8),
+            (1, 7),
+            (7, 2),
+            (2, 8),
+            (8, 9),
+            (8, 12),
+            (8, 15),
+            (8, 13),
+            (12, 4),
+            (4, 11),
+            (11, 3),
+            (3, 10),
+            (15, 13),
+            (13, 11),
+            (13, 9),
+            (15, 14),
+            (14, 13)
         ]
         for start, end in edges:
             self.graph.add_edge(start, end)
 
     def __init_tunnels(self):
-        s = 'Дніпро'
-        t = 'Павлоград'
+        s = 8
+        t = 11
         tunnel1 = Tunnel(
             0, 0, self.routes(s, t)[0], self.routes(s, t)[0][:: -1], 0)
         tunnel2 = Tunnel(
