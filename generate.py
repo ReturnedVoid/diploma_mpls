@@ -17,7 +17,7 @@ def generate_example_inputs(g, util):
     sample.append(gutil.source)
     sample.append(gutil.target)
 
-    threads = [round(np.random.uniform(1, 8), 2) for _ in range(15)]
+    threads = [round(np.random.uniform(3, 8), 2) for _ in range(15)]
     for k in gutil.tunnels_load:
         sample.append(k)
     for thread in threads:
@@ -87,4 +87,4 @@ def generate_dataset(m, filename):
                 writer.writerow(inputs[i])
 
 
-generate_dataset(10, 'dataset2.csv')
+generate_dataset(1000, 'dataset2.csv')
