@@ -1,8 +1,6 @@
 import csv
 from diploma_mpls.graph import GraphUtil
 import numpy as np
-import sys
-
 
 gutil = GraphUtil()
 unique_routes = gutil.unique_routes
@@ -12,6 +10,7 @@ ethernet_max_throughput = 125e5  # 100 MB/s
 
 
 def generate_example_inputs(g, util):
+    util.init_network_load()
 
     sample = []
     sample.append(np.random.choice(list(range(8))))
@@ -52,7 +51,7 @@ def generate_example_output(sample):
             d = [(t, gutil.tunnels_load[t.index]) for t in tuns]
             best_tunnel = min(d, key=lambda x: x[1])[0]
         cnt[i] = best_tunnel.index
-
+    print('------------Segment--------------')
     return cnt
 
 
@@ -66,38 +65,24 @@ def generate_dataset(m, filename):
     for source, dest in gutil.destinations[0]:
         gutil.source = source
         gutil.target = dest
-        # maybe i need to get cnt for every destination
-        # unique_routes_cnt = gutil.unique_routes_cnt
-        cnt = [0] * unique_routes_cnt
-        examples_per_route = m // unique_routes_cnt
-        print('Generating {} examples per route'.format(examples_per_route))
-        new_datas = []
-        new_labels = []
+
+        inputs = []
+        outputs = []
         i = 0
 
-        while True:
-            new_data, new_label = generate_example(gutil)
-
-            if cnt[new_label] < examples_per_route:
-                new_datas.append(new_data)
-                new_labels.append(new_label)
-                cnt[new_label] += 1
-
-            if len(new_datas) >= examples_per_route * unique_routes_cnt:
-                break
+        while i < m:
+            inp, out = generate_example(gutil)
+            inputs.append(inp)
+            outputs.append(out)
 
             i += 1
-            if i % 100 == 0:
-                perc = int(np.floor(len(new_datas) / m * 100))
-                print(cnt, '{}%'.format(perc))
 
-        m = examples_per_route * unique_routes_cnt
         with open(filename, 'a', newline='') as f:
             writer = csv.writer(f)
             for i in range(m):
                 k = []
-                k.append(new_labels[i])
-                example = new_datas[i] + k
+                k.append(outputs[i])
+                example = inputs[i] + k
                 writer.writerow(example)
 
 
