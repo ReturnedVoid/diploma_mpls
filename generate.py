@@ -1,6 +1,7 @@
 import csv
 from diploma_mpls.graph import GraphUtil
 import numpy as np
+import itertools
 
 gutil = GraphUtil()
 unique_routes = gutil.unique_routes
@@ -39,7 +40,7 @@ def generate_example_output(sample):
     tuns = [t for t in gutil.tunnels if t.cos == current_cos]
     for i in range(len(threads)):
         d = [(t, gutil.tunnels_load[t.index]) for t in tuns]
-        print(gutil.tunnels_load)
+        # print(gutil.tunnels_load)
         best_tunnel = min(d, key=lambda x: x[1])[0]
 
         if gutil.add_load(best_tunnel.index, threads[i] / 100).load >= 0.65:
@@ -51,7 +52,7 @@ def generate_example_output(sample):
             d = [(t, gutil.tunnels_load[t.index]) for t in tuns]
             best_tunnel = min(d, key=lambda x: x[1])[0]
         cnt[i] = best_tunnel.index
-    print('------------Segment--------------')
+    # print('------------Segment--------------')
     return cnt
 
 
@@ -62,29 +63,28 @@ def generate_example(util):
 
 
 def generate_dataset(m, filename):
+    f = open(filename, 'a', newline='')
     for source, dest in gutil.destinations[0]:
         gutil.source = source
         gutil.target = dest
+        # inputs = []
+        # outputs = []
 
-        inputs = []
-        outputs = []
-        i = 0
+        for k in range(8):
+            i = 0
+            while i < m:
+                inp, out = generate_example(gutil)
+                if inp[0] != k:
+                    continue
+                sample = []
+                for z in itertools.chain(inp, out):
+                    sample.append(z)
+                writer = csv.writer(f)
+                writer.writerow(sample)
 
-        while i < m:
-            inp, out = generate_example(gutil)
-            inputs.append(inp)
-            outputs.append(out)
-
-            i += 1
-
-        with open(filename, 'a', newline='') as f:
-            writer = csv.writer(f)
-            for i in range(m):
-                k = []
-                k.append(outputs[i])
-                for out in outputs[i]:
-                    inputs[i].append(out)
-                writer.writerow(inputs[i])
+                i += 1
+    f.close()
 
 
-generate_dataset(1000, 'dataset2.csv')
+generate_dataset(500, 'dataset2.csv')
+generate_dataset(500, 'dataset.csv')
