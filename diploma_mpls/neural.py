@@ -4,26 +4,23 @@ import numpy as np
 from keras import losses
 import keras
 import matplotlib.pyplot as plt
-from keras.layers.advanced_activations import LeakyReLU, PReLU
+import data
 
-
-num_of_inputs = 18
-num_of_outputs = 10
 np.random.seed(7)
 
-dataset = np.loadtxt("dataset2.csv", delimiter=",")
+dataset = np.loadtxt("dataset.csv", delimiter=",")
 # split into input (X) and output (Y) variables
-# np.random.shuffle(dataset)
-X = dataset[:, 0:-num_of_outputs]
-Y = dataset[:, num_of_inputs:]
+np.random.shuffle(dataset)
+
+X, Y = data.load_samples()
 
 
 # create model
 model = Sequential()
-model.add(Dense(50, input_dim=num_of_inputs, activation='relu'))
-model.add(Dense(25, activation='relu'))
-#model.add(Dense(12, activation='relu'))
-model.add(Dense(num_of_outputs, activation='relu'))
+model.add(Dense(34, input_dim=data.num_of_inputs, activation='relu'))
+model.add(Dense(23, activation='relu'))
+# model.add(Dense(38, activation='relu'))
+model.add(Dense(data.num_of_outputs, activation='relu'))
 
 # Compile model
 model.compile(optimizer=keras.optimizers.Adam(lr=0.001),
@@ -31,27 +28,16 @@ model.compile(optimizer=keras.optimizers.Adam(lr=0.001),
               metrics=['accuracy'])
 
 # Fit the model
-history = model.fit(X, Y, validation_split=0.2, epochs=400, batch_size=32)
+history = model.fit(X, Y, validation_split=0.2, epochs=100, batch_size=32)
 
 
 # evaluate the model
 scores = model.evaluate(X, Y)
 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
-# make prediction
-pr = np.loadtxt("dataset.csv", delimiter=",")
-pr = pr[:, 0:-num_of_outputs]
-
-pr = pr[2598]
-pr = pr.reshape(1, num_of_inputs)
-print(pr)
-predictions = model.predict(pr)
-# round predictions
-# rounded = [round(x[0]) for x in predictions]
-print(predictions)
+model.save('model.h5')
 
 
-print(history.history.keys())
 # summarize history for accuracy
 plt.plot(history.history['acc'])
 plt.plot(history.history['val_acc'])
