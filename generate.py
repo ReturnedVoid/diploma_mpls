@@ -3,12 +3,14 @@ from diploma_mpls.graph import GraphUtil
 import numpy as np
 import itertools
 import os
+from mpls_spec import ETHERNET_MAX_THROUGHTPUT_MBIT as emtm
+from mpls_spec import MPLS_TUNNEL_MAX_LOAD_KOEF as mtmlk
 
 gutil = GraphUtil()
 unique_routes = gutil.unique_routes
 unique_routes_cnt = gutil.unique_routes_cnt
 mpls_graph = gutil.graph
-ethernet_max_throughput = 125e5  # 100 MB/s
+ETH_MAX_THR = 100  # Mbit
 
 
 def del_sample_files(*files):
@@ -59,7 +61,8 @@ def generate_example_output(sample, util):
         d = [(t, gutil.tunnels_load[t.index]) for t in tuns]
 
         best_tunnel = min(d, key=lambda x: x[1])[0]
-        if gutil.add_load(best_tunnel.index, threads[i] / 100).load >= 0.65:
+        if gutil.add_load(
+                best_tunnel.index, threads[i] / emtm).load >= mtmlk:
             index = coses.index(best_tunnel.cos)
             if index - 1 != -1:
                 index -= 1

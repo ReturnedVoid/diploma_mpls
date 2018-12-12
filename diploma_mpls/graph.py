@@ -4,9 +4,6 @@ import matplotlib.pyplot as plt
 import itertools
 import numpy as np
 
-ethernet_max_packet_size = 1518 + 12 + 8
-ethernet_max_throughput = 125e5  # 100 MB/s
-ethernet_min_throughput = 1e2  # 100 bytes/s
 Tunnel = namedtuple('MPLSTunnel', 'index, cos, route invroute load')
 
 
