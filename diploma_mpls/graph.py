@@ -100,7 +100,7 @@ class GraphUtil:
 
     @property
     def tunnels_cnt(self):
-        return len(self.tunnels)
+        return 5
 
     @property
     def tunnels_load(self):
@@ -177,18 +177,7 @@ class GraphUtil:
         return sum(load_koefs)
 
     def __init_edges(self):
-        self.graph.add_nodes_from(list(range(15)))
-        self.graph.add_node(5)
-        self.graph.add_node(6)
-        self.graph.add_node(7)
-        self.graph.add_node(10)
-        self.graph.add_node(8)
-        self.graph.add_node(9)
-        self.graph.add_node(11)
-        self.graph.add_node(12)
-        self.graph.add_node(13)
-        self.graph.add_node(15)
-        self.graph.add_node(14)
+        self.graph.add_nodes_from(list(range(1, 16)))
 
         edges = [
             (5, 6),
@@ -229,17 +218,28 @@ class GraphUtil:
         tunnel5 = Tunnel(
             4, 2, self.routes(s, t)[4], self.routes(s, t)[4][:: -1], 0)
 
+        tunnel6 = Tunnel(5, tunnel1.cos, tunnel1.invroute, tunnel1.route, 0)
+        tunnel7 = Tunnel(6, tunnel2.cos, tunnel2.invroute, tunnel2.route, 0)
+        tunnel8 = Tunnel(7, tunnel3.cos, tunnel3.invroute, tunnel3.route, 0)
+        tunnel9 = Tunnel(8, tunnel4.cos, tunnel4.invroute, tunnel4.route, 0)
+        tunnel10 = Tunnel(9, tunnel5.cos, tunnel5.invroute, tunnel5.route, 0)
+
         self.tuns = []
         self.tuns.append(tunnel1)
         self.tuns.append(tunnel2)
         self.tuns.append(tunnel3)
         self.tuns.append(tunnel4)
         self.tuns.append(tunnel5)
+        self.tuns.append(tunnel6)
+        self.tuns.append(tunnel7)
+        self.tuns.append(tunnel8)
+        self.tuns.append(tunnel9)
+        self.tuns.append(tunnel10)
 
     def init_network_load(self):
         self.clear_edges_load()
         while True:
-            for tun in self.tunnels:
+            for tun in self.tunnels[0:5]:
                 self.add_load(tun.index, round(
                     np.random.uniform(0.04, 0.2), 2))
 
@@ -254,6 +254,13 @@ class GraphUtil:
                                 self.tunnels_load[i])
                 self.tuns[i] = tunnel
 
+            for i in range(5, 10):
+                tunnel = self.tunnels[i]
+                tunnel = Tunnel(tunnel.index, tunnel.cos,
+                                tunnel.route, tunnel.invroute,
+                                self.tuns[i-5].load)
+                self.tuns[i] = tunnel
+
             break
 
     def __init_destination(self):
@@ -266,7 +273,7 @@ class GraphUtil:
             self.graph[i][j]['K'] = 0
             self.graph[i][j]['intensity'] = 0
 
-        for i in range(self.tunnels_cnt):
+        for i in range(10):
             tun = self.tunnels[i]
             tun = Tunnel(tun.index, tun.cos, tun.route, tun.invroute, 0.0)
             self.tuns[i] = tun
