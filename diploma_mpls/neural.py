@@ -5,10 +5,12 @@ from keras import losses
 import keras
 import matplotlib.pyplot as plt
 import data
+from project_folders import SAMPLES_PATH, MODELS_PATH
 
 np.random.seed(7)
 
-dataset = np.loadtxt("dataset.csv", delimiter=",")
+dataset = np.loadtxt(
+    '{}/dataset.csv'.format(SAMPLES_PATH), delimiter=",")
 # split into input (X) and output (Y) variables
 np.random.shuffle(dataset)
 
@@ -34,7 +36,7 @@ history = model.fit(X, Y, validation_split=0.2, epochs=100, batch_size=32)
 scores = model.evaluate(X, Y)
 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
-model.save('model.h5')
+model.save('{}/model.h5'.format(MODELS_PATH))
 
 
 # summarize history for accuracy

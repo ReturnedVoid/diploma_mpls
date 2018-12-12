@@ -5,6 +5,7 @@ import itertools
 import os
 from mpls_spec import ETHERNET_MAX_THROUGHTPUT_MBIT as emtm
 from mpls_spec import MPLS_TUNNEL_MAX_LOAD_KOEF as mtmlk
+from project_folders import SAMPLES_PATH
 
 gutil = GraphUtil()
 unique_routes = gutil.unique_routes
@@ -118,6 +119,8 @@ def generate_dataset(m, filename):
     f.close()
 
 
-del_sample_files('dataset.csv', 'validation.csv')
-generate_dataset(400, 'dataset.csv')
-generate_dataset(10, 'validation.csv')
+del_sample_files('{}/dataset.csv'.format(SAMPLES_PATH),
+                 '{}/validation.csv'.format(SAMPLES_PATH))
+
+generate_dataset(400, '{}/dataset.csv'.format(SAMPLES_PATH))
+generate_dataset(10, '{}/validation.csv'.format(SAMPLES_PATH))
