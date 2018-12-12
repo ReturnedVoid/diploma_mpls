@@ -82,17 +82,26 @@ def generate_example(util):
 
 
 def generate_dataset(m, filename):
+    print('Generating dataset for {}'.format(filename))
     f = open(filename, 'a', newline='')
-    for source, dest in itertools.chain(gutil.destinations[0],
-                                        gutil.destinations[1]):
+    all_destinations = itertools.chain(gutil.destinations[0],
+                                       gutil.destinations[1])
+
+    for source, dest in all_destinations:
         gutil.source = source
         gutil.target = dest
 
         print('Generating samples for {0},{1} destination'
               .format(source, dest))
+        try:
+            current_dest_index = gutil.destinations[0].index((source, dest))
+            print('{}% done'.format(current_dest_index / 16 * 100))
+        except ValueError:
+            current_dest_index = gutil.destinations[1].index((source, dest))
+            current_dest_index += 8
+            print('{}% done'.format(current_dest_index / 16 * 100))
 
         for k in range(8):
-            print('Generating samples for {} class'.format(k))
             i = 0
             while i < m:
                 inp, out = generate_example(gutil)
