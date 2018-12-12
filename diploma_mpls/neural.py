@@ -14,12 +14,11 @@ np.random.shuffle(dataset)
 
 X, Y = data.load_samples()
 
-
 # create model
 model = Sequential()
-model.add(Dense(34, input_dim=data.num_of_inputs, activation='relu'))
-model.add(Dense(23, activation='relu'))
-# model.add(Dense(38, activation='relu'))
+model.add(Dense(36, input_dim=data.num_of_inputs, activation='relu'))
+model.add(Dense(150, activation='relu'))
+model.add(Dense(150, activation='relu'))
 model.add(Dense(data.num_of_outputs, activation='relu'))
 
 # Compile model
