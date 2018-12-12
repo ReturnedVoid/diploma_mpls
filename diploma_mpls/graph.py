@@ -91,10 +91,6 @@ class GraphUtil:
         return len(self.unique_routes)
 
     @property
-    def unique_routes_edges(self):
-        return [self.nodes_to_edges(route) for route in self.unique_routes]
-
-    @property
     def tunnels(self):
         return self.tuns
 
@@ -114,23 +110,6 @@ class GraphUtil:
                         tunnel.load + load)
         self.tuns[index] = tunnel
         return self.tuns[index]
-
-    @property
-    def tunnels_routes(self):
-        s = 8
-        t = 11
-        routes = [self.routes(s, t)[i] for i in range(5)]
-        invroutes = [self.routes(s, t)[i][:: -1] for i in range(5)]
-        return routes, invroutes
-
-    @property
-    def unique_edges_set(self):
-        u = []
-        for ure in self.unique_routes_edges:
-            for edge in ure:
-                if edge not in u:
-                    u.append(edge)
-        return u
 
     @property
     def destinations(self):
@@ -156,13 +135,6 @@ class GraphUtil:
             edge = (x, y)
             edges.append(edge)
         return edges
-
-    def get_route_load(self, path):
-        edge_path = self.nodes_to_edges(path)
-        load_koefs = []
-        for i, u in edge_path:
-            load_koefs.append(self.graph[i][u]['K'])
-        return sum(load_koefs)
 
     def __init_edges(self):
         self.graph.add_nodes_from(list(range(1, 16)))
@@ -256,11 +228,6 @@ class GraphUtil:
         self.target = self.TARGET
 
     def clear_edges_load(self):
-        for edge in self.graph.edges():
-            i, j = edge
-            self.graph[i][j]['K'] = 0
-            self.graph[i][j]['intensity'] = 0
-
         for i in range(10):
             tun = self.tunnels[i]
             tun = Tunnel(tun.index, tun.cos, tun.route, tun.invroute, 0.0)
