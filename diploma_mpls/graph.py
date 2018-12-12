@@ -124,18 +124,6 @@ class GraphUtil:
         return routes, invroutes
 
     @property
-    def routes_with_index(self):
-        i = self.tunnels_cnt
-        rwi = []
-        for u in self.unique_routes:
-            if u in self.tunnels_routes:
-                continue
-            else:
-                rwi.append((i, u))
-                i += 1
-        return rwi
-
-    @property
     def unique_edges_set(self):
         u = []
         for ure in self.unique_routes_edges:
