@@ -71,7 +71,6 @@ def generate_example_output(sample, util):
             d = [(t, gutil.tunnels_load[t.index]) for t in tuns]
             best_tunnel = min(d, key=lambda x: x[1])[0]
         cnt[i] = best_tunnel.index
-    # print('------------Segment--------------')
     return cnt
 
 
