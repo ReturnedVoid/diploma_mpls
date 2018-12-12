@@ -10,7 +10,6 @@ gutil = GraphUtil()
 unique_routes = gutil.unique_routes
 unique_routes_cnt = gutil.unique_routes_cnt
 mpls_graph = gutil.graph
-ETH_MAX_THR = 100  # Mbit
 
 
 def del_sample_files(*files):
