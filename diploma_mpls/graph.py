@@ -59,7 +59,10 @@ class GraphUtil:
                     to, self.tunnels[i].route[1:])))
 
                 if self.target != self.tunnels[i].route[-1]:
-                    temp[0].append(self.target)
+                    route_to_target = self.routes(
+                        self.tunnels[i].route[-1], self.target)
+                    for node in route_to_target[0][1:]:
+                        temp[0].append(node)
 
             else:
                 to = self.routes(self.source, 11)
@@ -71,7 +74,10 @@ class GraphUtil:
                     to, self.tunnels[i].invroute[1:])))
 
                 if self.target != self.tunnels[i].invroute[-1]:
-                    temp[0].append(self.target)
+                    route_to_target = self.routes(
+                        self.tunnels[i].route[-1], self.target)
+                    for node in route_to_target[0][1:]:
+                        temp[0].append(node)
 
             route.append(temp[0])
             temp.clear()
