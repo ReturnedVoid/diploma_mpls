@@ -122,5 +122,5 @@ def generate_dataset(m, filename):
 del_sample_files('{}/dataset.csv'.format(SAMPLES_PATH),
                  '{}/validation.csv'.format(SAMPLES_PATH))
 
-generate_dataset(400, '{}/dataset.csv'.format(SAMPLES_PATH))
+generate_dataset(50, '{}/dataset.csv'.format(SAMPLES_PATH))
 generate_dataset(10, '{}/validation.csv'.format(SAMPLES_PATH))
