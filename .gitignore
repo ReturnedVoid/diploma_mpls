@@ -4,7 +4,7 @@
 /.vscode
 /build
 /dist
-/test.py
+test.py
 /Graph.png
 /diploma_mpls/pima-indians-diabetes.csv
 test_generator.py
